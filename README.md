@@ -1,7 +1,7 @@
 # 企业知识问答 Agent（小影校招 · 第 3 题）
 
 ## 环境与安装
-Python 3.11+
+Python 3.10+
 ```bash
 pip install -r requirements.txt
 cp .env.example .env   # 填入 LLM_API_KEY；OpenAI 兼容接口均可
