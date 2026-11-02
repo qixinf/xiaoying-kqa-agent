@@ -1,0 +1,59 @@
+{
+  "case": {
+    "id": "C10",
+    "accept": [
+      "步数上限"
+    ],
+    "question": "报销期限多久？",
+    "max_steps": 2,
+    "expect_status": "incomplete",
+    "expect_docs": []
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 1.9,
+  "status": "incomplete",
+  "answer": "已达到最大步数 2，任务未完成，未给出结论。",
+  "citations": [],
+  "gaps": [
+    "步数上限内未能完成检索与核验"
+  ],
+  "clarifying_question": null,
+  "stop_reason": "max_steps",
+  "steps_used": 2,
+  "tool_calls_used": 3,
+  "trace": [
+    {
+      "step": 1,
+      "action": "search_docs",
+      "args": {
+        "query": "报销期限",
+        "top_k": 4
+      },
+      "reason": "先检索报销期限的制度表述，看看是否能直接定位到相关条款。",
+      "result": "4 条命中: D01#1 报销需附发票原件或电子发票。; D02#1 报销单需经直属上级审批后提交财务。; D01#0 员工应在费用发生之日起 30 天内提交报; D02#0 费用报销申请须在费用发生后 15 天内提",
+      "next_action": "read_doc"
+    },
+    {
+      "step": 2,
+      "action": "read_doc",
+      "args": {
+        "doc_id": "D01"
+      },
+      "reason": "需要读取费用报销管理办法原文，核对报销期限及适用范围。",
+      "result": "读取 D01《费用报销管理办法》v2025-03-01 范围:全体员工 共 2 段",
+      "next_action": "read_doc"
+    },
+    {
+      "step": 2,
+      "action": "read_doc",
+      "args": {
+        "doc_id": "D02"
+      },
+      "reason": "需要读取财务报销操作指引原文，核对报销期限及是否与其他制度冲突。",
+      "result": "读取 D02《财务报销操作指引》v2025-09-15 范围:未注明 共 2 段",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

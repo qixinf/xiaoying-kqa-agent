@@ -1,0 +1,49 @@
+{
+  "case": {
+    "id": "C11",
+    "accept": [
+      "追问"
+    ],
+    "question": "那个标准是多少？",
+    "expect_status": "need_clarification",
+    "expect_docs": []
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 2.3,
+  "status": "need_clarification",
+  "answer": "需要先确认“那个”具体指什么，否则无法检索并回答。",
+  "citations": [],
+  "gaps": [
+    "问题中的“那个”缺少具体对象，无法判断要查询哪项标准、制度或产品指标。"
+  ],
+  "clarifying_question": "请问“那个”具体是指哪一项标准、制度或产品指标？你可以直接补充关键词，比如：费用标准、报销标准、审批标准、考核标准、产品规格等。",
+  "stop_reason": "finished",
+  "steps_used": 2,
+  "tool_calls_used": 1,
+  "trace": [
+    {
+      "step": 1,
+      "action": "text_reply",
+      "result": "需要先确认“那个”具体指什么，否则无法检索并回答。\nstatus=need_clarification\n\n请问“那个”具体是指哪一项标准、制度或产品指标？  \n",
+      "next_action": "代码提醒模型使用 finish"
+    },
+    {
+      "step": 2,
+      "action": "finish",
+      "args": {
+        "status": "need_clarification",
+        "answer": "需要先确认“那个”具体指什么，否则无法检索并回答。",
+        "citations": [],
+        "gaps": [
+          "问题中的“那个”缺少具体对象，无法判断要查询哪项标准、制度或产品指标。"
+        ],
+        "clarifying_question": "请问“那个”具体是指哪一项标准、制度或产品指标？你可以直接补充关键词，比如：费用标准、报销标准、审批标准、考核标准、产品规格等。"
+      },
+      "reason": "用户要求提交结果；由于指代不明，按规则需返回 need_clarification。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

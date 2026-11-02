@@ -1,0 +1,71 @@
+{
+  "case": {
+    "id": "C01",
+    "accept": [
+      "明确答案"
+    ],
+    "question": "入职 3 年的员工年假有几天？",
+    "expect_status": "answered",
+    "expect_docs": [
+      "D03"
+    ]
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 2.8,
+  "status": "answered",
+  "answer": "入职满 1 年不满 10 年的员工，每年享有带薪年假 5 天；因此，入职 3 年的员工年假是 5 天。",
+  "citations": [
+    {
+      "doc_id": "D03",
+      "quote": "入职满 1 年不满 10 年的员工，每年享有带薪年假 5 天。"
+    }
+  ],
+  "gaps": [],
+  "clarifying_question": null,
+  "stop_reason": "finished",
+  "steps_used": 3,
+  "tool_calls_used": 3,
+  "trace": [
+    {
+      "step": 1,
+      "action": "search_docs",
+      "args": {
+        "query": "年假 入职 3年 天数",
+        "top_k": 5
+      },
+      "reason": "先检索年假天数的制度表述，确认是否有按入职年限计算的规定。",
+      "result": "3 条命中: D03#2 年假需提前 3 个工作日在 HR 系统提; D03#0 入职满 1 年不满 10 年的员工，每年; D03#1 入职满 10 年不满 20 年的员工，每",
+      "next_action": "read_doc"
+    },
+    {
+      "step": 2,
+      "action": "read_doc",
+      "args": {
+        "doc_id": "D03"
+      },
+      "reason": "读取年假制度原文，核实入职年限对应的年假天数并准备逐字引用。",
+      "result": "读取 D03《年假制度》v2026-01-01 范围:全体正式员工 共 3 段",
+      "next_action": "finish"
+    },
+    {
+      "step": 3,
+      "action": "finish",
+      "args": {
+        "status": "answered",
+        "answer": "入职满 1 年不满 10 年的员工，每年享有带薪年假 5 天；因此，入职 3 年的员工年假是 5 天。",
+        "citations": [
+          {
+            "doc_id": "D03",
+            "quote": "入职满 1 年不满 10 年的员工，每年享有带薪年假 5 天。"
+          }
+        ],
+        "gaps": []
+      },
+      "reason": "已从原文核实到适用条款，且 3 年属于该年限区间。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

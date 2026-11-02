@@ -1,0 +1,54 @@
+{
+  "case": {
+    "id": "C11",
+    "accept": [
+      "追问"
+    ],
+    "question": "那个标准是多少？",
+    "expect_status": "need_clarification",
+    "expect_docs": []
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 2.4,
+  "status": "need_clarification",
+  "answer": "你问的“那个标准”目前无法确定具体指哪一项。检索到的候选是“差旅住宿标准”，其中包括“一线城市（北京、上海、广州、深圳）出差住宿标准为每晚 600 元”和“其他城市出差住宿标准为每晚 400 元”。",
+  "citations": [],
+  "gaps": [
+    "缺少“那个标准”所指的具体对象或场景，无法直接判断要回答哪一项标准。"
+  ],
+  "clarifying_question": "你是想问差旅住宿标准吗？如果是，请告诉我城市或出差场景；如果不是，请说明具体是哪一个标准。",
+  "stop_reason": "finished",
+  "steps_used": 2,
+  "tool_calls_used": 2,
+  "trace": [
+    {
+      "step": 1,
+      "action": "search_docs",
+      "args": {
+        "query": "标准 是多少",
+        "top_k": 5
+      },
+      "reason": "用户只问“那个标准是多少”，需先尝试检索可能相关的标准表述，但问题指代不明确。",
+      "result": "3 条命中: D04#2 超出标准的部分需部门负责人审批。; D04#1 其他城市出差住宿标准为每晚 400 元。; D04#0 一线城市（北京、上海、广州、深圳）出差住",
+      "next_action": "finish"
+    },
+    {
+      "step": 2,
+      "action": "finish",
+      "args": {
+        "status": "need_clarification",
+        "answer": "你问的“那个标准”目前无法确定具体指哪一项。检索到的候选是“差旅住宿标准”，其中包括“一线城市（北京、上海、广州、深圳）出差住宿标准为每晚 600 元”和“其他城市出差住宿标准为每晚 400 元”。",
+        "citations": [],
+        "gaps": [
+          "缺少“那个标准”所指的具体对象或场景，无法直接判断要回答哪一项标准。"
+        ],
+        "clarifying_question": "你是想问差旅住宿标准吗？如果是，请告诉我城市或出差场景；如果不是，请说明具体是哪一个标准。"
+      },
+      "reason": "问题中的“那个”指代不明，按要求需要先澄清对象后再回答。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

@@ -1,0 +1,89 @@
+{
+  "case": {
+    "id": "C08",
+    "accept": [
+      "文档冲突（可查证）"
+    ],
+    "question": "现在每周可以远程办公几天？",
+    "expect_status": "answered",
+    "expect_docs": [
+      "D06"
+    ]
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 3.1,
+  "status": "answered",
+  "answer": "现在适用的是 2026-05-01 生效的修订版：员工每周可远程办公 2 天。该版本明确写明“替代 D05《远程办公政策》”，因此以 D06 为准。",
+  "citations": [
+    {
+      "doc_id": "D06",
+      "quote": "本版本自 2026-05-01 起生效，替代 D05《远程办公政策》。"
+    },
+    {
+      "doc_id": "D06",
+      "quote": "员工每周可远程办公 2 天，需提前在 OA 系统登记。"
+    }
+  ],
+  "gaps": [],
+  "clarifying_question": null,
+  "stop_reason": "finished",
+  "steps_used": 3,
+  "tool_calls_used": 4,
+  "trace": [
+    {
+      "step": 1,
+      "action": "search_docs",
+      "args": {
+        "query": "远程办公 每周 天数",
+        "top_k": 4
+      },
+      "reason": "先检索制度中关于每周远程办公天数的书面表述。",
+      "result": "3 条命中: D05#0 员工每周可远程办公 1 天。; D06#1 员工每周可远程办公 2 天，需提前在 O; D06#0 本版本自 2026-05-01 起生效，",
+      "next_action": "read_doc"
+    },
+    {
+      "step": 2,
+      "action": "read_doc",
+      "args": {
+        "doc_id": "D05"
+      },
+      "reason": "核对旧版远程办公政策的原文及适用范围。",
+      "result": "读取 D05《远程办公政策》v2024-06-01 范围:全体员工 共 1 段",
+      "next_action": "read_doc"
+    },
+    {
+      "step": 2,
+      "action": "read_doc",
+      "args": {
+        "doc_id": "D06"
+      },
+      "reason": "核对修订版远程办公政策的原文、有效日期和替代关系。",
+      "result": "读取 D06《远程办公政策（2026 修订版）》v2026-05-01 范围:全体员工 共 2 段",
+      "next_action": "finish"
+    },
+    {
+      "step": 3,
+      "action": "finish",
+      "args": {
+        "status": "answered",
+        "answer": "现在适用的是 2026-05-01 生效的修订版：员工每周可远程办公 2 天。该版本明确写明“替代 D05《远程办公政策》”，因此以 D06 为准。",
+        "citations": [
+          {
+            "doc_id": "D06",
+            "quote": "本版本自 2026-05-01 起生效，替代 D05《远程办公政策》。"
+          },
+          {
+            "doc_id": "D06",
+            "quote": "员工每周可远程办公 2 天，需提前在 OA 系统登记。"
+          }
+        ],
+        "gaps": []
+      },
+      "reason": "已通过原文确认最新版本及替代关系，能够直接回答。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

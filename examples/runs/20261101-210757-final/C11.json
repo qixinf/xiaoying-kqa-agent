@@ -1,0 +1,107 @@
+{
+  "case": {
+    "id": "C11",
+    "accept": [
+      "追问"
+    ],
+    "question": "那个标准是多少？",
+    "expect_status": "need_clarification",
+    "expect_docs": []
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 4.7,
+  "status": "need_clarification",
+  "answer": "你说的“那个标准”指代不明确。已检索到《差旅住宿标准》，但需要你确认具体是问一线城市还是其他城市的住宿标准。",
+  "citations": [
+    {
+      "doc_id": "D04",
+      "quote": "一线城市（北京、上海、广州、深圳）出差住宿标准为每晚 600 元。"
+    },
+    {
+      "doc_id": "D04",
+      "quote": "其他城市出差住宿标准为每晚 400 元。"
+    }
+  ],
+  "gaps": [
+    "问题中的“那个标准”缺少具体对象，无法判断是指一线城市还是其他城市的住宿标准。"
+  ],
+  "clarifying_question": "你想问的是一线城市（北京、上海、广州、深圳）出差住宿标准，还是其他城市出差住宿标准？",
+  "stop_reason": "finished",
+  "steps_used": 4,
+  "tool_calls_used": 4,
+  "trace": [
+    {
+      "step": 1,
+      "action": "search_docs",
+      "args": {
+        "query": "标准 是多少",
+        "top_k": 4
+      },
+      "reason": "用户问“那个标准是多少”，指代不明确，先检索可能相关的制度表述以判断是否能对应到具体标准。",
+      "result": "3 条命中: D04#2 超出标准的部分需部门负责人审批。; D04#1 其他城市出差住宿标准为每晚 400 元。; D04#0 一线城市（北京、上海、广州、深圳）出差住",
+      "next_action": "finish"
+    },
+    {
+      "step": 2,
+      "action": "finish",
+      "args": {
+        "status": "need_clarification",
+        "answer": "你说的“标准”指哪一项不明确。检索到的候选是“差旅住宿标准”，其中包含一线城市每晚 600 元、其他城市每晚 400 元。请你确认具体是问哪一个标准。",
+        "citations": [
+          {
+            "doc_id": "D04",
+            "quote": "一线城市（北京、上海、广州、深圳）出差住宿标准为每晚 600 元。"
+          },
+          {
+            "doc_id": "D04",
+            "quote": "其他城市出差住宿标准为每晚 400 元。"
+          }
+        ],
+        "gaps": [
+          "问题中的“那个标准”缺少具体对象，无法确定是住宿、报销还是其他标准。"
+        ],
+        "clarifying_question": "你想问的是差旅住宿标准，还是其他哪一项标准？如果是差旅住宿标准，请说明城市范围。"
+      },
+      "reason": "问题中的指代不明确，先给出候选并请用户确认具体对象。",
+      "result": "ERROR: [validation] finish 校验未通过，请修正后重新提交：citations[0] 引用的 D04 本轮未用 read_doc 读取过原文；citations[1] 引用的 D04 本轮未用 read_doc 读取过原文",
+      "next_action": "read_doc"
+    },
+    {
+      "step": 3,
+      "action": "read_doc",
+      "args": {
+        "doc_id": "D04"
+      },
+      "reason": "需要先读取差旅住宿标准原文，才能提供逐字引用并回答用户的指代问题。",
+      "result": "读取 D04《差旅住宿标准》v2026-02-01 范围:全体员工 共 3 段",
+      "next_action": "finish"
+    },
+    {
+      "step": 4,
+      "action": "finish",
+      "args": {
+        "status": "need_clarification",
+        "answer": "你说的“那个标准”指代不明确。已检索到《差旅住宿标准》，但需要你确认具体是问一线城市还是其他城市的住宿标准。",
+        "citations": [
+          {
+            "doc_id": "D04",
+            "quote": "一线城市（北京、上海、广州、深圳）出差住宿标准为每晚 600 元。"
+          },
+          {
+            "doc_id": "D04",
+            "quote": "其他城市出差住宿标准为每晚 400 元。"
+          }
+        ],
+        "gaps": [
+          "问题中的“那个标准”缺少具体对象，无法判断是指一线城市还是其他城市的住宿标准。"
+        ],
+        "clarifying_question": "你想问的是一线城市（北京、上海、广州、深圳）出差住宿标准，还是其他城市出差住宿标准？"
+      },
+      "reason": "已读取原文，但用户问题仍然只有指代词，必须先请用户确认具体对象。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

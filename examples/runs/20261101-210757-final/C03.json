@@ -1,0 +1,75 @@
+{
+  "case": {
+    "id": "C03",
+    "accept": [
+      "资料外问题"
+    ],
+    "question": "公司的股票期权怎么行权？",
+    "expect_status": "no_info",
+    "expect_docs": []
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 4.3,
+  "status": "no_info",
+  "answer": "目前检索到的制度文档中，没有找到关于“股票期权怎么行权”的明确规定或流程。",
+  "citations": [],
+  "gaps": [
+    "缺少公司股票期权/股权激励制度原文，无法确认行权条件、申请流程、材料要求、审批路径和时间限制。"
+  ],
+  "clarifying_question": null,
+  "stop_reason": "finished",
+  "steps_used": 4,
+  "tool_calls_used": 4,
+  "trace": [
+    {
+      "step": 1,
+      "action": "search_docs",
+      "args": {
+        "query": "股票期权 行权",
+        "top_k": 5
+      },
+      "reason": "先检索公司制度中关于股票期权行权的书面条款与流程。",
+      "result": "0 条命中（query=股票期权 行权）",
+      "next_action": "search_docs"
+    },
+    {
+      "step": 2,
+      "action": "search_docs",
+      "args": {
+        "query": "期权 行权条件 行权流程",
+        "top_k": 5
+      },
+      "reason": "改用制度常见书面表述继续检索股票期权行权的条件和流程。",
+      "result": "0 条命中（query=期权 行权条件 行权流程）",
+      "next_action": "search_docs"
+    },
+    {
+      "step": 3,
+      "action": "search_docs",
+      "args": {
+        "query": "股权激励 期权激励 行权价格",
+        "top_k": 5
+      },
+      "reason": "第三次用相关制度术语检索，判断是否存在股票期权或股权激励制度。",
+      "result": "0 条命中（query=股权激励 期权激励 行权价格）",
+      "next_action": "finish"
+    },
+    {
+      "step": 4,
+      "action": "finish",
+      "args": {
+        "status": "no_info",
+        "answer": "目前检索到的制度文档中，没有找到关于“股票期权怎么行权”的明确规定或流程。",
+        "citations": [],
+        "gaps": [
+          "缺少公司股票期权/股权激励制度原文，无法确认行权条件、申请流程、材料要求、审批路径和时间限制。"
+        ]
+      },
+      "reason": "已按要求完成多次关键词改写检索，仍未找到可支持回答的制度依据。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}
