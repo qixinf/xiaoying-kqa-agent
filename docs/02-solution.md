@@ -25,18 +25,19 @@
 
 ```mermaid
 flowchart TD
-    Q[用户问题 + 可选对话历史] --> L{模型选择动作}
-    L -->|search_docs| S[BM25 段落检索]
-    L -->|read_doc| R[读取原文<br/>记入"已读文档"]
-    L -->|finish| V{validator 校验}
-    L -->|直接文字回复| N[代码提醒：请用 finish] --> L
-    S --> O[观察结果写回消息<br/>并记入 Trace]
+    Q["用户问题 + 可选对话历史"] --> L{"模型选择动作"}
+    L -->|search_docs| S["BM25 段落检索"]
+    L -->|read_doc| R["读取原文<br/>记入已读文档"]
+    L -->|finish| V{"validator 校验"}
+    L -->|直接文字回复| N["代码提醒：请用 finish"]
+    N --> L
+    S --> O["观察结果写回消息<br/>并记入 Trace"]
     R --> O
     V -->|不通过| O
-    V -->|通过| E[返回结果<br/>status/answer/citations/gaps]
-    O --> C{达到步数或<br/>调用上限?}
+    V -->|通过| E["返回结果<br/>status / answer / citations / gaps"]
+    O --> C{"达到步数或<br/>调用上限？"}
     C -->|否| L
-    C -->|是| I[返回 incomplete<br/>不给结论]
+    C -->|是| I["返回 incomplete<br/>不给结论"]
 ```
 
 每一轮的过程：
