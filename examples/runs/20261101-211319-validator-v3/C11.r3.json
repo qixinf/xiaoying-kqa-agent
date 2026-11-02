@@ -1,0 +1,43 @@
+{
+  "case": {
+    "id": "C11",
+    "accept": [
+      "追问"
+    ],
+    "question": "那个标准是多少？",
+    "expect_status": "need_clarification",
+    "expect_docs": []
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 1.2,
+  "status": "need_clarification",
+  "answer": "你说的“那个”指的是哪一项标准？我需要你补充对象名称后才能查询制度。",
+  "citations": [],
+  "gaps": [
+    "问题中的“那个”缺少具体指代对象，无法确定要查询的标准。"
+  ],
+  "clarifying_question": "请告诉我你要问的是哪一项标准，例如“出差标准”“报销标准”“招聘标准”等。",
+  "stop_reason": "finished",
+  "steps_used": 1,
+  "tool_calls_used": 1,
+  "trace": [
+    {
+      "step": 1,
+      "action": "finish",
+      "args": {
+        "status": "need_clarification",
+        "answer": "你说的“那个”指的是哪一项标准？我需要你补充对象名称后才能查询制度。",
+        "citations": [],
+        "gaps": [
+          "问题中的“那个”缺少具体指代对象，无法确定要查询的标准。"
+        ],
+        "clarifying_question": "请告诉我你要问的是哪一项标准，例如“出差标准”“报销标准”“招聘标准”等。"
+      },
+      "reason": "问题含指代词“那个”，缺少关键对象，需先澄清后才能检索。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

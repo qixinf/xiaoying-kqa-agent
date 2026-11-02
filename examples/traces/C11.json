@@ -1,0 +1,49 @@
+{
+  "case": {
+    "id": "C11",
+    "accept": [
+      "追问"
+    ],
+    "question": "那个标准是多少？",
+    "expect_status": "need_clarification",
+    "expect_docs": []
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 2.0,
+  "status": "need_clarification",
+  "answer": "需要先确认“那个”指代的具体对象，才能检索对应制度。",
+  "citations": [],
+  "gaps": [
+    "问题中的“那个标准”指代不明确，缺少具体对象或场景，无法检索对应制度。"
+  ],
+  "clarifying_question": "你说的“那个标准”具体是指什么标准？请补充对象名称或场景，例如“报销标准”“加班标准”“年假标准”等。",
+  "stop_reason": "finished",
+  "steps_used": 2,
+  "tool_calls_used": 1,
+  "trace": [
+    {
+      "step": 1,
+      "action": "text_reply",
+      "result": "需要先确认“那个”指代的具体对象，才能检索对应制度。\nstatus=need_clarification\n\nclarifying_question: 你说的“那",
+      "next_action": "代码提醒模型使用 finish"
+    },
+    {
+      "step": 2,
+      "action": "finish",
+      "args": {
+        "status": "need_clarification",
+        "answer": "需要先确认“那个”指代的具体对象，才能检索对应制度。",
+        "citations": [],
+        "gaps": [
+          "问题中的“那个标准”指代不明确，缺少具体对象或场景，无法检索对应制度。"
+        ],
+        "clarifying_question": "你说的“那个标准”具体是指什么标准？请补充对象名称或场景，例如“报销标准”“加班标准”“年假标准”等。"
+      },
+      "reason": "用户要求按工具提交结果，当前问题指代不明确，需要用 finish 返回 need_clarification。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

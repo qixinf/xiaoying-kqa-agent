@@ -1,0 +1,97 @@
+{
+  "case": {
+    "id": "C08",
+    "accept": [
+      "文档冲突（可查证）"
+    ],
+    "question": "现在每周可以远程办公几天？",
+    "expect_status": "answered",
+    "expect_docs": [
+      "D06"
+    ]
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 3.2,
+  "status": "answered",
+  "answer": "目前按现行制度，每周可远程办公 2 天。新版《远程办公政策（2026 修订版）》写明自 2026-05-01 起生效，并替代旧版《远程办公政策》；旧版原文为每周 1 天。",
+  "citations": [
+    {
+      "doc_id": "D06",
+      "quote": "本版本自 2026-05-01 起生效，替代 D05《远程办公政策》。"
+    },
+    {
+      "doc_id": "D06",
+      "quote": "员工每周可远程办公 2 天，需提前在 OA 系统登记。"
+    },
+    {
+      "doc_id": "D05",
+      "quote": "员工每周可远程办公 1 天。"
+    }
+  ],
+  "gaps": [],
+  "clarifying_question": null,
+  "stop_reason": "finished",
+  "steps_used": 3,
+  "tool_calls_used": 4,
+  "trace": [
+    {
+      "step": 1,
+      "action": "search_docs",
+      "args": {
+        "query": "远程办公 每周 几天",
+        "top_k": 5
+      },
+      "reason": "先检索制度中关于每周远程办公天数的表述。",
+      "result": "3 条命中: D05#0 员工每周可远程办公 1 天。; D06#1 员工每周可远程办公 2 天，需提前在 O; D06#0 本版本自 2026-05-01 起生效，",
+      "next_action": "read_doc"
+    },
+    {
+      "step": 2,
+      "action": "read_doc",
+      "args": {
+        "doc_id": "D05"
+      },
+      "reason": "读取旧版远程办公政策原文，核对每周远程办公天数和是否被替代。",
+      "result": "读取 D05《远程办公政策》v2024-06-01 范围:全体员工 共 1 段",
+      "next_action": "read_doc"
+    },
+    {
+      "step": 2,
+      "action": "read_doc",
+      "args": {
+        "doc_id": "D06"
+      },
+      "reason": "读取新版远程办公政策原文，核对每周远程办公天数和替代关系。",
+      "result": "读取 D06《远程办公政策（2026 修订版）》v2026-05-01 范围:全体员工 共 2 段",
+      "next_action": "finish"
+    },
+    {
+      "step": 3,
+      "action": "finish",
+      "args": {
+        "status": "answered",
+        "answer": "目前按现行制度，每周可远程办公 2 天。新版《远程办公政策（2026 修订版）》写明自 2026-05-01 起生效，并替代旧版《远程办公政策》；旧版原文为每周 1 天。",
+        "citations": [
+          {
+            "doc_id": "D06",
+            "quote": "本版本自 2026-05-01 起生效，替代 D05《远程办公政策》。"
+          },
+          {
+            "doc_id": "D06",
+            "quote": "员工每周可远程办公 2 天，需提前在 OA 系统登记。"
+          },
+          {
+            "doc_id": "D05",
+            "quote": "员工每周可远程办公 1 天。"
+          }
+        ],
+        "gaps": []
+      },
+      "reason": "已读取原文并确认新版替代旧版，因此可直接回答现行规则。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

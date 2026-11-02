@@ -1,0 +1,67 @@
+{
+  "case": {
+    "id": "C07",
+    "accept": [
+      "工具失败"
+    ],
+    "question": "年假要提前几天申请？",
+    "fail": {
+      "search_docs": -1
+    },
+    "expect_status": "tool_failed",
+    "expect_docs": []
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 2.8,
+  "status": "tool_failed",
+  "answer": "未能完成检索，暂时无法确认年假需要提前几天申请。",
+  "citations": [],
+  "gaps": [
+    "检索工具连续失败，未能获取年假申请提前天数的制度原文。"
+  ],
+  "clarifying_question": null,
+  "stop_reason": "finished",
+  "steps_used": 3,
+  "tool_calls_used": 3,
+  "trace": [
+    {
+      "step": 1,
+      "action": "search_docs",
+      "args": {
+        "query": "年假 申请 提前 几天",
+        "top_k": 4
+      },
+      "reason": "先检索年假申请提前天数的制度表述。",
+      "result": "ERROR: [unavailable, 可重试] search_docs 服务暂时不可用（注入失败，第 1 次调用）。可重试，剩余重试次数 1。",
+      "next_action": "search_docs"
+    },
+    {
+      "step": 2,
+      "action": "search_docs",
+      "args": {
+        "query": "年休假 申请 提前 天数",
+        "top_k": 4
+      },
+      "reason": "改用制度常见书面说法再次检索年休假申请提前天数。",
+      "result": "ERROR: [unavailable] search_docs 服务暂时不可用（注入失败，第 2 次调用）。已连续失败 2 次（重试上限 1 次已用完），请停止调用该工具，以 status=tool_failed 如实报告。",
+      "next_action": "finish"
+    },
+    {
+      "step": 3,
+      "action": "finish",
+      "args": {
+        "status": "tool_failed",
+        "answer": "未能完成检索，暂时无法确认年假需要提前几天申请。",
+        "citations": [],
+        "gaps": [
+          "检索工具连续失败，未能获取年假申请提前天数的制度原文。"
+        ]
+      },
+      "reason": "检索工具连续失败且已达重试上限，无法继续完成查询。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

@@ -1,0 +1,71 @@
+{
+  "case": {
+    "id": "C04",
+    "accept": [
+      "改写后的相似问题"
+    ],
+    "question": "我上班两年了，一年能歇几天带薪的假？",
+    "expect_status": "answered",
+    "expect_docs": [
+      "D03"
+    ]
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 2.9,
+  "status": "answered",
+  "answer": "你入职两年，按年假制度属于“入职满 1 年不满 10 年”的范围，每年享有带薪年假 5 天。",
+  "citations": [
+    {
+      "doc_id": "D03",
+      "quote": "入职满 1 年不满 10 年的员工，每年享有带薪年假 5 天。"
+    }
+  ],
+  "gaps": [],
+  "clarifying_question": null,
+  "stop_reason": "finished",
+  "steps_used": 3,
+  "tool_calls_used": 3,
+  "trace": [
+    {
+      "step": 1,
+      "action": "search_docs",
+      "args": {
+        "query": "带薪年假 天数 工作满两年",
+        "top_k": 5
+      },
+      "reason": "检索员工带薪年假天数的制度表述。",
+      "result": "3 条命中: D03#0 入职满 1 年不满 10 年的员工，每年; D03#1 入职满 10 年不满 20 年的员工，每; D03#2 年假需提前 3 个工作日在 HR 系统提",
+      "next_action": "read_doc"
+    },
+    {
+      "step": 2,
+      "action": "read_doc",
+      "args": {
+        "doc_id": "D03"
+      },
+      "reason": "读取年假制度原文以确认适用条款和可引用内容。",
+      "result": "读取 D03《年假制度》v2026-01-01 范围:全体正式员工 共 3 段",
+      "next_action": "finish"
+    },
+    {
+      "step": 3,
+      "action": "finish",
+      "args": {
+        "status": "answered",
+        "answer": "你入职两年，按年假制度属于“入职满 1 年不满 10 年”的范围，每年享有带薪年假 5 天。",
+        "citations": [
+          {
+            "doc_id": "D03",
+            "quote": "入职满 1 年不满 10 年的员工，每年享有带薪年假 5 天。"
+          }
+        ],
+        "gaps": []
+      },
+      "reason": "已读取原文并据此给出可直接回答的年假天数。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

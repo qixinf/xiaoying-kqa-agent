@@ -1,0 +1,14 @@
+{
+  "label": "final-v3",
+  "started": "2026-11-01 21:14:06",
+  "model": "gpt-5.4-mini",
+  "base_url": "https://api.openai.com/v1",
+  "params": {},
+  "dropped_params": [
+    "reasoning_effort: Error code: 400 - Function tools with reasoning_effort are not supported for gpt-5.4-mini in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  ],
+  "git": "dabf831",
+  "repeat": 1,
+  "passed": 11,
+  "total": 11
+}
