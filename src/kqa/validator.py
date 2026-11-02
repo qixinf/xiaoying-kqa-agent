@@ -5,6 +5,8 @@
   引用   文档存在；本轮已用 read_doc 读过；quote 是原文逐字片段（忽略空白差异）
   状态   answered ≥1 条引用；conflict ≥2 份不同文档；no_info / tool_failed 不带引用；
          need_clarification 必须给出追问
+  过程   no_info 前必须至少成功检索过一次；tool_failed 前必须真的观察到过工具服务失败
+         （防止不检索就说"没有资料"，或没有失败却谎报失败）
   数字   answered / conflict 的 answer 中出现的数字，必须出现在引用原文、被引文档的版本日期或用户问题中
          （启发式：拦截"引用 D01 却回答 15 天"这类张冠李戴，不做语义判断）
 """
@@ -27,7 +29,9 @@ def _numbers(text: str) -> set[str]:
     return set(_NUM.findall(_DOC_REF.sub(" ", text or "")))
 
 
-def validate_finish(args: dict, corpus: Corpus, read_doc_ids: set[str], question: str = "") -> list[str]:
+def validate_finish(args: dict, corpus: Corpus, read_doc_ids: set[str], question: str = "",
+                    evidence: dict | None = None) -> list[str]:
+    """evidence 由 agent 循环提供：{"searches_ok": 成功检索次数, "unavailable": 观察到的服务失败次数}。"""
     errors: list[str] = []
     status = args.get("status")
     answer = args.get("answer")
@@ -70,6 +74,13 @@ def validate_finish(args: dict, corpus: Corpus, read_doc_ids: set[str], question
         errors.append(f"status={status} 不应附带引用")
     if status == "need_clarification" and not str(args.get("clarifying_question") or "").strip():
         errors.append("status=need_clarification 必须给出 clarifying_question")
+
+    # ---- 过程证据 ----
+    if evidence is not None:
+        if status == "no_info" and evidence.get("searches_ok", 0) == 0:
+            errors.append("status=no_info 之前必须至少成功执行一次 search_docs，才能判断资料中没有答案")
+        if status == "tool_failed" and evidence.get("unavailable", 0) == 0:
+            errors.append("status=tool_failed 但本轮没有观察到任何工具服务失败")
 
     # ---- 数字溯源（只在引用本身合法时检查，避免重复报错）----
     if status in {"answered", "conflict"} and valid_quotes and len(valid_quotes) == len(cits):

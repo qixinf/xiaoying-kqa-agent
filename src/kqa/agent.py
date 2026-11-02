@@ -89,6 +89,7 @@ def run_agent(question: str, llm, corpus: Corpus, toolbox: ToolBox | None = None
     read_doc_ids: set[str] = set()
     done_calls: dict[str, int] = {}  # 成功调用的 key → 首次出现的步骤
     tool_calls_used = 0
+    evidence = {"searches_ok": 0, "unavailable": 0}  # 供 validator 核对 no_info / tool_failed 是否有依据
 
     def stop(status: str, stop_reason: str, answer: str, step: int, **kw) -> AgentResult:
         return AgentResult(status=status, answer=answer, stop_reason=stop_reason, steps_used=step,
@@ -130,7 +131,7 @@ def run_agent(question: str, llm, corpus: Corpus, toolbox: ToolBox | None = None
                 obs = {"ok": False, "error_type": "bad_args", "retryable": False,
                        "error": "finish 不能与其他工具在同一轮调用：请先看到工具结果，再单独调用 finish"}
             elif tc.name == "finish":
-                errors = validate_finish(args, corpus, read_doc_ids, question=question)
+                errors = validate_finish(args, corpus, read_doc_ids, question=question, evidence=evidence)
                 if not errors:
                     entry["result"] = "校验通过，任务结束"
                     trace.append(entry)
@@ -144,6 +145,10 @@ def run_agent(question: str, llm, corpus: Corpus, toolbox: ToolBox | None = None
                        "error": f"与第 {done_calls[key]} 步的调用完全相同，结果不会变化。请换参数、读其他文档或提交 finish"}
             else:
                 obs = toolbox.call(tc.name, args)
+                if obs.get("error_type") == "unavailable":
+                    evidence["unavailable"] += 1
+                if obs.get("ok") and tc.name == "search_docs":
+                    evidence["searches_ok"] += 1
                 if obs.get("ok"):
                     done_calls[key] = step
                     if tc.name == "read_doc":

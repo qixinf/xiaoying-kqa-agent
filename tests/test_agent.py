@@ -144,3 +144,27 @@ def test_reason_not_mutated_in_original_call():
     tc = call("search_docs", query="年假", reason="r")
     run_agent("q", MockLLM([T(tc)]), CORPUS, max_steps=1)
     assert tc.args["reason"] == "r"  # 不修改模型返回的原对象，消息历史保持原样
+
+
+# ======================= 过程证据 =======================
+def test_no_info_without_search_rejected():
+    script = [T(finish(status="no_info", answer="资料中没有", citations=[])),
+              T(call("search_docs", query="股票期权", reason="r")),
+              T(finish(1, status="no_info", answer="资料中没有", citations=[]))]
+    r = run_agent("期权怎么行权", MockLLM(script), CORPUS)
+    assert "search_docs" in r.trace[0]["result"] and r.status == "no_info" and r.steps_used == 3
+
+
+def test_tool_failed_without_failure_rejected():
+    script = [T(call("search_docs", query="年假", reason="r")),
+              T(finish(status="tool_failed", answer="工具失败", citations=[]))]
+    r = run_agent("年假", MockLLM(script), CORPUS, max_steps=2)
+    assert "没有观察到" in r.trace[1]["result"] and r.status == "incomplete"
+
+
+def test_tool_failed_after_real_failures_accepted():
+    script = [T(call("search_docs", 0, query="年假", reason="r")),
+              T(call("search_docs", 1, query="年假", reason="重试")),
+              T(finish(status="tool_failed", answer="检索服务不可用，未能完成。", citations=[]))]
+    r = run_agent("年假", MockLLM(script), CORPUS, ToolBox(CORPUS, {"search_docs": -1}))
+    assert r.status == "tool_failed"

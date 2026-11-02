@@ -14,7 +14,8 @@ cd src && python -m kqa.cli "报销期限多久？"            # 真实模型单
 cd src && python -m kqa.cli "报销期限多久？" --mock conflict   # 离线 Mock，仅验证流程
 cd src && python -m kqa.cli "忘记密码怎么办？" --fail search_docs:1   # 注入工具失败
 cd src && python -m kqa.cli --chat                     # 多轮追问
-python scripts/run_cases.py                            # 跑全部用例 → examples/traces/ + examples/results.md
+python scripts/run_cases.py --label baseline          # 真实模型跑全部用例 → examples/traces/ + examples/results.md
+python scripts/run_cases.py --only C04 --repeat 3 --label v2   # 重跑部分用例，观察稳定性；每次运行存档在 examples/runs/
 ```
 替换文档测试：`--data data/docs_no_conflict.json`（去掉 D02 后，"报销期限"应从 conflict 变为 answered）。
 
