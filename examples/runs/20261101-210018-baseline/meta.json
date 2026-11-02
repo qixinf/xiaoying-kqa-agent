@@ -1,0 +1,14 @@
+{
+  "label": "baseline",
+  "started": "2026-11-01 21:00:18",
+  "model": "gpt-5.4-mini",
+  "base_url": "https://api.openai.com/v1",
+  "params": {},
+  "dropped_params": [
+    "reasoning_effort"
+  ],
+  "git": "a2f38c5",
+  "repeat": 1,
+  "passed": 10,
+  "total": 11
+}

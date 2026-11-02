@@ -1,0 +1,86 @@
+{
+  "case": {
+    "id": "C06",
+    "accept": [
+      "工具失败",
+      "正常恢复"
+    ],
+    "question": "忘记密码怎么办？",
+    "fail": {
+      "search_docs": 1
+    },
+    "expect_status": "answered",
+    "expect_docs": [
+      "D08"
+    ]
+  },
+  "passed": true,
+  "note": "符合预期",
+  "seconds": 3.8,
+  "status": "answered",
+  "answer": "忘记密码时，可在 IT 自助门户通过手机验证码重置。",
+  "citations": [
+    {
+      "doc_id": "D08",
+      "quote": "忘记密码可在 IT 自助门户通过手机验证码重置。"
+    }
+  ],
+  "gaps": [],
+  "clarifying_question": null,
+  "stop_reason": "finished",
+  "steps_used": 4,
+  "tool_calls_used": 4,
+  "trace": [
+    {
+      "step": 1,
+      "action": "search_docs",
+      "args": {
+        "query": "忘记密码 怎么办",
+        "top_k": 4
+      },
+      "reason": "先按口语关键词检索密码找回相关制度或FAQ。",
+      "result": "ERROR: [unavailable, 可重试] search_docs 服务暂时不可用（注入失败，第 1 次调用）。可重试，剩余重试次数 1。",
+      "next_action": "search_docs"
+    },
+    {
+      "step": 2,
+      "action": "search_docs",
+      "args": {
+        "query": "密码 找回",
+        "top_k": 4
+      },
+      "reason": "改用制度书面说法检索密码找回相关内容。",
+      "result": "2 条命中: D08#1 忘记密码可在 IT 自助门户通过手机验证; D08#0 员工账号密码每 90 天需更换一次。",
+      "next_action": "read_doc"
+    },
+    {
+      "step": 3,
+      "action": "read_doc",
+      "args": {
+        "doc_id": "D08"
+      },
+      "reason": "读取密码规范原文以确认找回方式并准备逐字引用。",
+      "result": "读取 D08《IT 账号与密码规范》v2026-01-15 范围:全体员工 共 2 段",
+      "next_action": "finish"
+    },
+    {
+      "step": 4,
+      "action": "finish",
+      "args": {
+        "status": "answered",
+        "answer": "忘记密码时，可在 IT 自助门户通过手机验证码重置。",
+        "citations": [
+          {
+            "doc_id": "D08",
+            "quote": "忘记密码可在 IT 自助门户通过手机验证码重置。"
+          }
+        ],
+        "gaps": []
+      },
+      "reason": "已从原文确认密码重置方式并给出可执行答复。",
+      "result": "校验通过，任务结束",
+      "next_action": "结束"
+    }
+  ],
+  "mode": "real_llm:gpt-5.4-mini"
+}

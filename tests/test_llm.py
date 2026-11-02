@@ -1,7 +1,6 @@
 """OpenAIChat 的参数兼容逻辑（不联网，用假 client）。"""
 from types import SimpleNamespace
 
-import httpx
 import pytest
 from openai import BadRequestError
 
@@ -14,8 +13,8 @@ def _resp(tool_calls=None, content="ok"):
 
 
 def _bad_request(msg):
-    req = httpx.Request("POST", "https://api.openai.com/v1/chat/completions")
-    return BadRequestError(msg, response=httpx.Response(400, request=req), body=None)
+    response = SimpleNamespace(request=None, status_code=400, headers={})
+    return BadRequestError(msg, response=response, body=None)
 
 
 class FakeCompletions:
@@ -51,7 +50,7 @@ def test_default_model_and_no_optional_params(monkeypatch):
 def test_rejected_param_is_dropped_once(monkeypatch):
     llm, fake = make(monkeypatch, {"LLM_TEMPERATURE": "0", "LLM_REASONING_EFFORT": "low"}, reject=["temperature"])
     llm.chat([], []); llm.chat([], [])
-    assert llm.dropped_params == ["temperature"]
+    assert len(llm.dropped_params) == 1 and llm.dropped_params[0].startswith("temperature: ")
     assert len(fake.calls) == 3  # 第 1 次被拒 + 重试 + 第 2 次直接成功
     assert fake.calls[-1]["reasoning_effort"] == "low" and "temperature" not in fake.calls[-1]
 

@@ -63,7 +63,7 @@ class OpenAIChat:
                 raise
             for p in bad:
                 self.extra.pop(p)
-                self.dropped_params.append(p)
+                self.dropped_params.append(f"{p}: {str(e)[:200]}")  # 记录服务端给出的原因
             return self.client.chat.completions.create(model=self.model, messages=messages, tools=tools,
                                                        tool_choice="auto", **self.extra)
 
