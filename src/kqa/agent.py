@@ -21,7 +21,8 @@ SYSTEM_PROMPT = """你是公司内部的知识问答助手，只能依据工具�
    - 原文无法判定 → status=conflict，列出各文档说法与引用，请用户确认适用哪份制度。绝不自行挑一个。
 4. 检索不到依据 → status=no_info，在 gaps 说明缺什么，不得凭常识回答。
 5. 问题指代不清、且对话历史也无法补全 → status=need_clarification 并给出追问。
-6. 工具报错可重试 1 次或换参数；仍失败 → status=tool_failed，说明未能完成。
+6. 工具报错时看 retryable：为 true 可重试 1 次；为 false 应修正参数或换文档 ID，不要原样重试。
+   仍无法完成 → status=tool_failed，说明未能完成的原因，不得凭常识作答。
 7. 每次调用工具都在 reason 里写一句理由。必须调用 finish 结束任务，不要直接用文字回复。"""
 
 
@@ -42,7 +43,8 @@ class AgentResult:
 def _summarize(obs: dict) -> str:
     """Trace 里只放返回摘要，避免记录整篇原文。"""
     if not obs.get("ok"):
-        return f"ERROR: {obs.get('error')} {obs.get('details', '')}".strip()
+        tag = f"[{obs['error_type']}{', 可重试' if obs.get('retryable') else ''}] " if "error_type" in obs else ""
+        return f"ERROR: {tag}{obs.get('error')} {obs.get('details', '')}".strip()
     data = obs["data"]
     if "hits" in data:
         return f"{data['count']} 条命中: " + "; ".join(f"{h['doc_id']}#{h['para']} {h['snippet'][:20]}" for h in data["hits"])
