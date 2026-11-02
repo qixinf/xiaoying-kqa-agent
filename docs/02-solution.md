@@ -144,7 +144,6 @@ Prompt 只能"建议"，评审注入异常时最容易失守的就是只靠 prom
 
 - 模型：`gpt-5.4-mini`，通过 OpenAI 兼容的 Chat Completions 接口调用；改 `LLM_BASE_URL` 和 `LLM_MODEL` 即可换成其他兼容服务。
 - `temperature` 和 `reasoning_effort` 只在 `.env` 里配置了才会发送。若被服务端拒绝，自动去掉该参数重试一次，原因记录在 `dropped_params` 中。
-- 实测：gpt-5.4-mini 在 `/v1/chat/completions` 上不支持"function tools + reasoning_effort"的组合，所以全部真实运行都在默认推理强度（none）下进行。详见 `03-evaluation.md`。
 
 ### 6.5 依赖
 

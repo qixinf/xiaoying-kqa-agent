@@ -37,12 +37,12 @@ cp .env.example .env               # 填入 LLM_API_KEY；离线测试和 Mock �
 | `LLM_API_KEY` | 跑真实模型时必填 | OpenAI 或其他兼容服务的 Key |
 | `LLM_BASE_URL` | 否 | 留空表示 OpenAI 官方；使用 DeepSeek 等服务时填对应地址 |
 | `LLM_MODEL` | 否 | 默认 `gpt-5.4-mini` |
-| `LLM_REASONING_EFFORT` / `LLM_TEMPERATURE` | 否 | 只在填写时发送；被服务端拒绝时自动去掉（原因见 `.env.example`） |
+| `LLM_REASONING_EFFORT` / `LLM_TEMPERATURE` | 否 | 只在填写时发送；被服务端拒绝时自动去掉 |
 
 ## 运行
 
 ```bash
-# 1. 离线测试（无需 Key）
+# 1. 离线测试
 pytest -q                                                    # 77 passed
 
 # 2. 离线 Mock 演示（无需 Key；只验证流程，不代表真实模型的决策效果）
@@ -100,7 +100,6 @@ docs/             01–05
 
 ## 已知限制
 
-- 所有真实运行都在默认推理强度下完成：gpt-5.4-mini 在 Chat Completions 接口上不支持"工具调用 + reasoning_effort"。
 - 样本量小（11 个用例），C11 的执行路径在多次运行间不稳定（最终状态一致）。
 - 数字溯源是启发式规则；引用只校验"原文中存在"，不校验"原文支持结论"。
 - BM25 无法匹配同义词，依赖模型改写查询。
