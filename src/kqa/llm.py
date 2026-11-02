@@ -30,15 +30,45 @@ class LLMTurn:
 
 
 class OpenAIChat:
+    """OpenAI 兼容的 Chat Completions 接入。
+
+    可选参数只在 .env 里填写时才发送，因为不同模型支持的参数不同：
+      LLM_TEMPERATURE       旧模型（gpt-4o 系列、DeepSeek 等）可设 0 提高可复现性
+      LLM_REASONING_EFFORT  GPT-5.x 推理模型可设 none/low/medium/high
+    若服务端拒绝某个可选参数，自动去掉该参数重试一次，并在之后的调用中不再发送。
+    """
+
+    OPTIONAL_PARAMS = ("temperature", "reasoning_effort")
+
     def __init__(self, model: str | None = None, base_url: str | None = None, api_key: str | None = None):
         from openai import OpenAI
-        self.model = model or os.getenv("LLM_MODEL", "gpt-4o-mini")
+        self.model = model or os.getenv("LLM_MODEL") or "gpt-5.4-mini"
         self.client = OpenAI(api_key=api_key or os.getenv("LLM_API_KEY"),
                              base_url=base_url or os.getenv("LLM_BASE_URL") or None)
+        self.extra: dict = {}
+        if os.getenv("LLM_TEMPERATURE"):
+            self.extra["temperature"] = float(os.environ["LLM_TEMPERATURE"])
+        if os.getenv("LLM_REASONING_EFFORT"):
+            self.extra["reasoning_effort"] = os.environ["LLM_REASONING_EFFORT"]
+        self.dropped_params: list[str] = []
+
+    def _create(self, messages, tools):
+        from openai import BadRequestError
+        try:
+            return self.client.chat.completions.create(model=self.model, messages=messages, tools=tools,
+                                                       tool_choice="auto", **self.extra)
+        except BadRequestError as e:
+            bad = [p for p in self.OPTIONAL_PARAMS if p in self.extra and p in str(e)]
+            if not bad:
+                raise
+            for p in bad:
+                self.extra.pop(p)
+                self.dropped_params.append(p)
+            return self.client.chat.completions.create(model=self.model, messages=messages, tools=tools,
+                                                       tool_choice="auto", **self.extra)
 
     def chat(self, messages: list[dict], tools: list[dict]) -> LLMTurn:
-        r = self.client.chat.completions.create(model=self.model, messages=messages, tools=tools,
-                                                tool_choice="auto", temperature=0)
+        r = self._create(messages, tools)
         m = r.choices[0].message
         calls = []
         for c in m.tool_calls or []:
