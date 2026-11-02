@@ -5,7 +5,7 @@
      成功  {"ok": True,  "data": {...}}
      失败  {"ok": False, "error_type": ..., "retryable": bool, "error": "给模型看的说明"}
 2. error_type 只有四种：
-     unavailable  服务不可用（含注入的失败）  retryable=True   → 模型可重试 1 次
+     unavailable  服务不可用（含注入的失败）  retryable=True   → 模型可重试；连续失败超过 max_retries 后变为 False
      not_found    文档 ID 不存在             retryable=False  → 模型应换 ID 或重新检索
      bad_args     参数缺失或非法             retryable=False  → 模型应修正参数
      internal     未预料的内部错误           retryable=False  → 模型应停止并报告
@@ -19,6 +19,7 @@ import re
 from .corpus import Corpus
 
 DEFAULT_TOP_K = 4
+DEFAULT_MAX_RETRIES = 1  # 每个工具连续 unavailable 后允许的重试次数（理由见 docs/02-solution.md）
 MAX_TOP_K = 8
 MAX_QUERY_LEN = 100
 
@@ -83,12 +84,19 @@ class ToolBox:
     fail_plan 用于注入失败，验证模型能否观察并调整：
         {"search_docs": 1}   前 1 次调用失败，之后恢复
         {"search_docs": -1}  一直失败
+
+    max_retries 由代码强制：同一工具连续 unavailable 的次数超过 max_retries 后，
+    返回的错误 retryable=False，并提示停止。是否停止仍由模型决定，但代码不再给出"可重试"信号。
+    任何一次成功调用都会把该工具的连续失败计数清零。
     """
 
-    def __init__(self, corpus: Corpus, fail_plan: dict[str, int] | None = None):
+    def __init__(self, corpus: Corpus, fail_plan: dict[str, int] | None = None,
+                 max_retries: int = DEFAULT_MAX_RETRIES):
         self.corpus = corpus
         self.fail_plan = dict(fail_plan or {})
+        self.max_retries = max(0, int(max_retries))
         self.calls: dict[str, int] = {}
+        self.consecutive_failures: dict[str, int] = {}
 
     # ---- 失败注入 ----
     def _maybe_fail(self, name: str) -> None:
@@ -97,6 +105,24 @@ class ToolBox:
         budget = self.fail_plan.get(name, 0)
         if budget == -1 or n < budget:
             raise ToolError("unavailable", f"{name} 服务暂时不可用（注入失败，第 {n + 1} 次调用）", retryable=True)
+
+    def _apply_retry_budget(self, name: str, result: dict) -> dict:
+        """按工具统计连续 unavailable；超过上限后把 retryable 改为 False。"""
+        if result.get("ok"):
+            self.consecutive_failures[name] = 0
+            return result
+        if result.get("error_type") != "unavailable":
+            return result  # 参数错误、not_found 不计入，也不清零
+        n = self.consecutive_failures.get(name, 0) + 1
+        self.consecutive_failures[name] = n
+        retries_used = n - 1
+        if retries_used >= self.max_retries:
+            result["retryable"] = False
+            result["error"] += (f"。已连续失败 {n} 次（重试上限 {self.max_retries} 次已用完），"
+                                "请停止调用该工具，以 status=tool_failed 如实报告。")
+        else:
+            result["error"] += f"。可重试，剩余重试次数 {self.max_retries - retries_used}。"
+        return result
 
     # ---- 具体工具 ----
     def search_docs(self, query, top_k=DEFAULT_TOP_K) -> dict:
@@ -131,6 +157,12 @@ class ToolBox:
 
     # ---- 统一入口 ----
     def call(self, name: str, args: dict) -> dict:
+        result = self._dispatch(name, args)
+        if name in BUSINESS_TOOLS:
+            result = self._apply_retry_budget(name, result)
+        return result
+
+    def _dispatch(self, name: str, args: dict) -> dict:
         args = args if isinstance(args, dict) else {}
         try:
             if name == "search_docs":

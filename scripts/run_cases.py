@@ -47,7 +47,7 @@ def main() -> None:
         if a.only and case["id"] not in a.only:
             continue
         corpus = Corpus(ROOT / case.get("data", "data/docs.json"))
-        r = run_agent(case["question"], llm, corpus, ToolBox(corpus, case.get("fail")),
+        r = run_agent(case["question"], llm, corpus, ToolBox(corpus, case.get("fail"), case.get("max_retries", 1)),
                       case.get("history"), case.get("max_steps", 8))
         passed, note = check(case, r)
         record = {"case": case, "mode": f"real_llm:{llm.model}", "passed": passed, "note": note, **r.to_dict()}

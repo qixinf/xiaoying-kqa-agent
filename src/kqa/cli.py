@@ -44,6 +44,7 @@ def main() -> None:
     p.add_argument("--data", default=str(ROOT / "data/docs.json"))
     p.add_argument("--history", help="JSON 文件：[{role, content}, ...]")
     p.add_argument("--max-steps", type=int, default=8)
+    p.add_argument("--max-retries", type=int, default=1, help="每个工具连续服务失败后允许的重试次数")
     p.add_argument("--fail", action="append", help="注入失败，如 search_docs:1 或 read_doc:-1")
     p.add_argument("--mock", help="离线 Mock 脚本名：normal / conflict / tool_retry")
     p.add_argument("--trace-out", help="把完整结果和 Trace 写到该 JSON 文件")
@@ -59,7 +60,7 @@ def main() -> None:
             q = input("\n你：").strip()
             if q in {"", "exit", "quit"}:
                 break
-            r = run_agent(q, llm, corpus, ToolBox(corpus, parse_fail(a.fail)), history, a.max_steps)
+            r = run_agent(q, llm, corpus, ToolBox(corpus, parse_fail(a.fail), a.max_retries), history, a.max_steps)
             print(f"[{r.status}] {r.answer}")
             for c in r.citations:
                 print(f"  - {c['doc_id']}: {c['quote']}")
@@ -69,7 +70,7 @@ def main() -> None:
 
     if not a.question:
         p.error("需要提供问题，或使用 --chat")
-    r = run_agent(a.question, build_llm(a.mock), corpus, ToolBox(corpus, parse_fail(a.fail)), history, a.max_steps)
+    r = run_agent(a.question, build_llm(a.mock), corpus, ToolBox(corpus, parse_fail(a.fail), a.max_retries), history, a.max_steps)
     out = {"question": a.question, "mode": f"mock:{a.mock}" if a.mock else "real_llm", **r.to_dict()}
     text = json.dumps(out, ensure_ascii=False, indent=2)
     print(text)

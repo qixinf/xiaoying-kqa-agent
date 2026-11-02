@@ -90,3 +90,39 @@ def test_internal_error_never_raises(monkeypatch):
 
 def test_schema_names_match_tools():
     assert [t["function"]["name"] for t in TOOL_SCHEMAS] == ["search_docs", "read_doc", "finish"]
+
+
+# ---------- 重试上限（代码强制） ----------
+def test_retry_budget_default_one():
+    box = tb({"search_docs": -1})
+    first = box.call("search_docs", {"query": "年假"})
+    second = box.call("search_docs", {"query": "年假"})
+    assert first["retryable"] is True and "剩余重试次数 1" in first["error"]
+    assert second["retryable"] is False and "tool_failed" in second["error"]
+    assert box.call("search_docs", {"query": "年假"})["retryable"] is False  # 之后一直为 False
+
+
+@pytest.mark.parametrize("max_retries, flips_at", [(0, 1), (1, 2), (2, 3)])
+def test_retry_budget_configurable(max_retries, flips_at):
+    box = ToolBox(CORPUS, {"read_doc": -1}, max_retries=max_retries)
+    flags = [box.call("read_doc", {"doc_id": "D01"})["retryable"] for _ in range(flips_at)]
+    assert flags == [True] * (flips_at - 1) + [False]
+
+
+def test_success_resets_counter():
+    box = tb({"search_docs": 1})  # 第 1 次失败，之后成功
+    assert box.call("search_docs", {"query": "年假"})["retryable"] is True
+    assert box.call("search_docs", {"query": "年假"})["ok"] is True
+    assert box.consecutive_failures["search_docs"] == 0
+
+
+def test_budget_is_per_tool():
+    box = tb({"search_docs": -1, "read_doc": -1})
+    box.call("search_docs", {"query": "年假"}); box.call("search_docs", {"query": "年假"})
+    assert box.call("read_doc", {"doc_id": "D03"})["retryable"] is True  # read_doc 的额度不受影响
+
+
+def test_non_unavailable_errors_do_not_count():
+    box = tb({"read_doc": -1})
+    box.call("read_doc", {"doc_id": ""})  # bad_args
+    assert box.call("read_doc", {"doc_id": "D03"})["retryable"] is True
