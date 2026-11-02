@@ -7,8 +7,9 @@
          need_clarification 必须给出追问
   过程   no_info 前必须至少成功检索过一次；tool_failed 前必须真的观察到过工具服务失败
          （防止不检索就说"没有资料"，或没有失败却谎报失败）
-  数字   answered / conflict 的 answer 中出现的数字，必须出现在引用原文、被引文档的版本日期或用户问题中
-         （启发式：拦截"引用 D01 却回答 15 天"这类张冠李戴，不做语义判断）
+  数字   answered / conflict / need_clarification 展示给用户的数字（answer 与 clarifying_question），
+         必须出现在引用原文、被引文档的版本日期或用户问题中
+         （启发式：拦截"引用 D01 却回答 15 天"，以及追问里夹带未经读取核实的数字；不做语义判断）
 """
 from __future__ import annotations
 
@@ -83,11 +84,14 @@ def validate_finish(args: dict, corpus: Corpus, read_doc_ids: set[str], question
             errors.append("status=tool_failed 但本轮没有观察到任何工具服务失败")
 
     # ---- 数字溯源（只在引用本身合法时检查，避免重复报错）----
-    if status in {"answered", "conflict"} and valid_quotes and len(valid_quotes) == len(cits):
+    checkable = (status in {"answered", "conflict"} and cits) or status == "need_clarification"
+    if checkable and len(valid_quotes) == len(cits):
         allowed = _numbers(" ".join(valid_quotes)) | _numbers(question)
         for did in cited_docs:
             allowed |= _numbers(corpus.docs[did].version_date)
-        unsupported = sorted(_numbers(answer) - allowed, key=float)
+        shown = f"{answer} {args.get('clarifying_question') or ''}"
+        unsupported = sorted(_numbers(shown) - allowed, key=float)
         if unsupported:
-            errors.append(f"answer 中的数字 {unsupported} 在引用原文中找不到依据；请补充引用或删去该数字")
+            errors.append(f"展示给用户的数字 {unsupported} 在引用原文中找不到依据；"
+                          "请先 read_doc 并补充引用，或删去该数字")
     return errors

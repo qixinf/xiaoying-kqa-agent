@@ -168,3 +168,16 @@ def test_tool_failed_after_real_failures_accepted():
               T(finish(status="tool_failed", answer="检索服务不可用，未能完成。", citations=[]))]
     r = run_agent("年假", MockLLM(script), CORPUS, ToolBox(CORPUS, {"search_docs": -1}))
     assert r.status == "tool_failed"
+
+
+def test_clarification_cannot_leak_unverified_numbers():
+    # 真实运行中出现过：追问里直接写出"600 元 / 400 元"，但没有读原文、没有引用
+    v = lambda a: validate_finish(a, CORPUS, {"D04"}, question="那个标准是多少？")
+    leak = {"status": "need_clarification", "answer": "候选：差旅住宿标准，一线城市 600 元，其他城市 400 元。",
+            "citations": [], "clarifying_question": "您是问差旅住宿标准吗？"}
+    assert any("['400', '600']" in e for e in v(leak))
+    ok = {**leak, "answer": "检索到候选《差旅住宿标准》，请确认。"}
+    assert v(ok) == []
+    cited = {**leak, "citations": [{"doc_id": "D04", "quote": "一线城市（北京、上海、广州、深圳）出差住宿标准为每晚 600 元。"},
+                                   {"doc_id": "D04", "quote": "其他城市出差住宿标准为每晚 400 元。"}]}
+    assert v(cited) == []
